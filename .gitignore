@@ -4,3 +4,8 @@ temp
 visualizations
 statistics
 gurobi.log
+.vscode/settings.json
+.vscode/
+.DS_Store
+examples/blocksworld/sas_plan.1
+

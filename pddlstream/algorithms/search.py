@@ -4,9 +4,11 @@ from copy import deepcopy
 from time import time
 
 from pddlstream.language.temporal import solve_tfd
-from pddlstream.algorithms.downward import parse_solution, run_search, TEMP_DIR, write_pddl
+from pddlstream.algorithms.downward import parse_solution, run_search, TEMP_DIR, write_pddl, obj_evaluation_to_problem, parse_sequential_domain, task_from_domain_problem
 from pddlstream.algorithms.instantiate_task import write_sas_task, sas_from_pddl, translate_and_write_pddl
 from pddlstream.utils import INF, Verbose, safe_rm_dir
+from pddlstream.algorithms.common import evaluations_from_init
+from pddlstream.language.conversion import obj_from_value_expression
 
 # TODO: manual_patterns
 # Specify on the discrete variables that are updated via conditional effects
@@ -15,7 +17,27 @@ from pddlstream.utils import INF, Verbose, safe_rm_dir
 # TODO: allow switch to higher-level in heuristic
 # TODO: recursive application of these
 # TODO: write the domain and problem PDDL files that are used for debugging purposes
-
+class Pddl_Domain:
+    def __init__(self,domain_pddl):
+        self.domain = parse_sequential_domain(domain_pddl)
+    
+    def solve(self,objects,init, goal, planner = 'ff-astar', unit_costs = True, temp_dir=TEMP_DIR, clean=False, debug=False, **search_args):
+        # TODO: combine with solve_from_task
+        #return solve_tfd(domain_pddl, problem_pddl)
+        start_time = time()
+        with Verbose(debug):
+            evaluations = evaluations_from_init(init)
+            goal_exp = obj_from_value_expression(goal)
+            problem = obj_evaluation_to_problem(objects,evaluations,goal_exp,self.domain,unit_costs=unit_costs)
+            task = task_from_domain_problem(self.domain, problem)
+            sas_task = sas_from_pddl(task)
+            write_sas_task(sas_task, temp_dir)
+            solution = run_search(temp_dir,planner = planner, debug=debug, **search_args)
+            if clean:
+                safe_rm_dir(temp_dir)
+            print('Total runtime:', time() - start_time)
+        return solution
+    
 def solve_from_task(sas_task, temp_dir=TEMP_DIR, clean=False, debug=False, hierarchy=[], **search_args):
     # TODO: can solve using another planner and then still translate using FastDownward
     # Can apply plan constraints (skeleton constraints) here as well

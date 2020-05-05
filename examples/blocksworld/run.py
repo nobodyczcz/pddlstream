@@ -1,5 +1,4 @@
-#!/usr/bin/env python2.7
-
+#!/usr/bin/env python3.7
 from __future__ import print_function
 
 import os
@@ -56,7 +55,7 @@ def solve_pddlstream(focused=False):
 
 def main():
     #solve_pddl()
-    solve_pddlstream()
+    solve_pddlstream(True)
 
 if __name__ == '__main__':
     main()

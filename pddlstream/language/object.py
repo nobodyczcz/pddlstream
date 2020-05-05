@@ -43,6 +43,8 @@ class Object(object):
         return Object._obj_from_value[value]
     @staticmethod
     def from_name(name):
+        if name not in Object._obj_from_name:
+            return Object(name, name=name)
         return Object._obj_from_name[name]
     @staticmethod
     def reset():

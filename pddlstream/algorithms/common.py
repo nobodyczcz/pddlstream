@@ -2,7 +2,7 @@ import time
 from collections import namedtuple, OrderedDict
 
 from pddlstream.language.constants import is_plan
-from pddlstream.language.conversion import evaluation_from_fact, obj_from_value_expression, revert_solution
+from pddlstream.language.conversion import evaluation_from_fact, obj_from_value_expression, revert_solution, obj_from_name_expression
 from pddlstream.utils import INF, elapsed_time
 
 # Complexity is a way to characterize the number of external evaluations required for a solution
@@ -86,7 +86,7 @@ def add_certified(evaluations, result):
 def evaluations_from_init(init):
     evaluations = OrderedDict()
     for raw_fact in init:
-        fact = obj_from_value_expression(raw_fact)
+        fact = obj_from_name_expression(raw_fact)
         add_fact(evaluations, fact, result=INIT_EVALUATION, complexity=0)
     return evaluations
 

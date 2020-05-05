@@ -93,8 +93,8 @@ def parse_problem(problem, stream_info={}, constraints=None, unit_costs=False, u
         evaluations = evaluations_from_init(init)
         goal_exp = obj_from_value_expression(goal)
         return evaluations, goal_exp, domain, streams
-    if len(domain.types) != 1:
-        raise NotImplementedError('Types are not currently supported')
+    # if len(domain.types) != 1:
+    #     raise NotImplementedError('Types are not currently supported')
     if unit_costs:
         set_unit_costs(domain)
     obj_from_constant = parse_constants(domain, constant_map)

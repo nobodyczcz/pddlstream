@@ -29,8 +29,11 @@ def replace_expression(parent, fn):
     args = get_args(parent)
     return Fact(name, map(fn, args))
 
-def obj_from_value_expression(parent):
+def obj_from_value_expression(parent):    
     return replace_expression(parent, lambda o: o if is_parameter(o) else Object.from_value(o))
+    
+def obj_from_name_expression(parent):    
+    return replace_expression(parent, lambda o: o if is_parameter(o) else Object.from_name(o))
 
 def value_from_obj_expression(parent):
     return replace_expression(parent, lambda o: o.value)
