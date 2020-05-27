@@ -16,6 +16,7 @@ $ git clone https://github.com/caelan/pddlstream.git
 $ cd pddlstream
 $ git submodule update --init --recursive
 $ ./FastDownward/build.py
+$ python3 setup.py install
 ```
 
 If `./FastDownward/build.py` fails, install FastDownward's dependencies using your package manager:
