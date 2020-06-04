@@ -1,12 +1,14 @@
 from __future__ import print_function
 
+import os
+
 from copy import deepcopy
 from time import time
 
 from pddlstream.language.temporal import solve_tfd
 from pddlstream.algorithms.downward import parse_solution, run_search, TEMP_DIR, write_pddl, obj_evaluation_to_problem, parse_sequential_domain, task_from_domain_problem
 from pddlstream.algorithms.instantiate_task import write_sas_task, sas_from_pddl, translate_and_write_pddl
-from pddlstream.utils import INF, Verbose, safe_rm_dir
+from pddlstream.utils import INF, Verbose, safe_rm_dir, read
 from pddlstream.algorithms.common import evaluations_from_init
 from pddlstream.language.conversion import obj_from_value_expression
 
@@ -18,11 +20,12 @@ from pddlstream.language.conversion import obj_from_value_expression
 # TODO: recursive application of these
 # TODO: write the domain and problem PDDL files that are used for debugging purposes
 class Pddl_Domain:
-    def __init__(self,domain_pddl):
-        self.domain = parse_sequential_domain(domain_pddl)
+    def __init__(self,filename):
+        self.domain_pddl = self.read_pddl(filename)
+        self.domain = parse_sequential_domain(self.domain_pddl)
     
-    def solve(self,objects,init, goal, planner = 'ff-astar', unit_costs = True, temp_dir=TEMP_DIR, clean=False, debug=False, **search_args):
-        # TODO: combine with solve_from_task
+    def solve(self,objects,init, goal, planner = 'ff-astar', unit_costs = False, temp_dir=TEMP_DIR, clean=False, debug=False, **search_args):
+        # solve problem with objests list, init list and goal list
         #return solve_tfd(domain_pddl, problem_pddl)
         start_time = time()
         with Verbose(debug):
@@ -37,6 +40,13 @@ class Pddl_Domain:
                 safe_rm_dir(temp_dir)
             print('Total runtime:', time() - start_time)
         return solution
+    
+    def solve_from_file(self,problem_pddl_path, planner = 'ff-astar', temp_dir=TEMP_DIR, clean=False, debug=False, **search_args):
+        problem_pddl = self.read_pddl(problem_pddl_path)
+        return solve_from_pddl(self.domain_pddl,problem_pddl,planner = planner, temp_dir=temp_dir, clean=clean, debug=debug, **search_args)
+    
+    def read_pddl(self,filename):
+        return read(filename)
     
 def solve_from_task(sas_task, temp_dir=TEMP_DIR, clean=False, debug=False, hierarchy=[], **search_args):
     # TODO: can solve using another planner and then still translate using FastDownward
