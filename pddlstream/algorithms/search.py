@@ -24,7 +24,7 @@ class Pddl_Domain:
         self.domain_pddl = self.read_pddl(filename)
         self.domain = parse_sequential_domain(self.domain_pddl)
     
-    def solve(self,objects,init, goal, planner = 'ff-astar', unit_costs = False, temp_dir="temp"+os.getpid()+"/", clean=True, debug=False, **search_args):
+    def solve(self,objects,init, goal, planner = 'ff-astar', unit_costs = False, temp_dir=TEMP_DIR, clean=True, debug=False, **search_args):
         # solve problem with objests list, init list and goal list
         #return solve_tfd(domain_pddl, problem_pddl)
         start_time = time()
@@ -41,7 +41,7 @@ class Pddl_Domain:
             print('Total runtime:', time() - start_time)
         return solution
     
-    def solve_from_file(self,problem_pddl_path, planner = 'ff-astar', temp_dir=TEMP_DIR, clean=False, debug=False, **search_args):
+    def solve_from_file(self,problem_pddl_path, planner = 'ff-astar', temp_dir=TEMP_DIR, clean=True, debug=False, **search_args):
         problem_pddl = self.read_pddl(problem_pddl_path)
         return solve_from_pddl(self.domain_pddl,problem_pddl,planner = planner, temp_dir=temp_dir, clean=clean, debug=debug, **search_args)
     
