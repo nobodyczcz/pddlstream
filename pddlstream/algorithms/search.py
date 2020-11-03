@@ -23,11 +23,13 @@ class Pddl_Domain:
     def __init__(self,filename):
         self.domain_pddl = self.read_pddl(filename)
         self.domain = parse_sequential_domain(self.domain_pddl)
+        self.temp_dir = TEMP_DIR
     
     def solve(self,objects,init, goal, planner = 'ff-astar', unit_costs = False, temp_dir=TEMP_DIR, clean=True, debug=False, **search_args):
         # solve problem with objests list, init list and goal list
         #return solve_tfd(domain_pddl, problem_pddl)
         start_time = time()
+        self.temp_dir = temp_dir
         with Verbose(debug):
             evaluations = evaluations_from_init(init)
             goal_exp = obj_from_value_expression(goal)
@@ -36,17 +38,19 @@ class Pddl_Domain:
             sas_task = sas_from_pddl(task)
             write_sas_task(sas_task, temp_dir)
             solution = run_search(temp_dir,planner = planner, debug=debug, **search_args)
-            if clean:
-                safe_rm_dir(temp_dir)
             print('Total runtime:', time() - start_time)
         return solution
     
     def solve_from_file(self,problem_pddl_path, planner = 'ff-astar', temp_dir=TEMP_DIR, clean=True, debug=False, **search_args):
+        self.temp_dir = temp_dir
         problem_pddl = self.read_pddl(problem_pddl_path)
         return solve_from_pddl(self.domain_pddl,problem_pddl,planner = planner, temp_dir=temp_dir, clean=clean, debug=debug, **search_args)
     
     def read_pddl(self,filename):
         return read(filename)
+    
+    def __del__(self):
+        safe_rm_dir(self.temp_dir)
     
 def solve_from_task(sas_task, temp_dir=TEMP_DIR, clean=False, debug=False, hierarchy=[], **search_args):
     # TODO: can solve using another planner and then still translate using FastDownward
